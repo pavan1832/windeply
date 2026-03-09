@@ -2,13 +2,15 @@
 
 > Enterprise-grade platform for automating, monitoring, and managing Windows OS deployments at scale.
 
+**Live Demo:**
+- Frontend: https://windeply.vercel.app
+- Backend API: https://windeply-1.onrender.com/health
+
 ---
 
 ## Overview
 
-**WinDeply** is a full-stack DevOps platform built to simulate and manage enterprise Windows OS deployment automation. It enables IT operations teams to define deployment templates, execute automated configuration workflows, monitor deployment status in real time, and maintain detailed audit logs across all managed endpoints.
-
-The system follows real-world patterns used in enterprise environments — from initial OS image application to final security hardening — with a professional terminal-style dashboard built for operations engineers.
+WinDeply is a full-stack DevOps platform that orchestrates Windows OS deployment workflows. IT operations teams can define reusable deployment templates, execute automated configuration workflows step-by-step, monitor deployment status in real time, and maintain a complete audit log of every action taken on every machine.
 
 ---
 
@@ -16,81 +18,30 @@ The system follows real-world patterns used in enterprise environments — from 
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│              FRONTEND DASHBOARD (Next.js)            │
-│   Dashboard · Jobs · Logs · Templates · Machines     │
+│         FRONTEND DASHBOARD  (Next.js / Vercel)      │
+│   Dashboard · Jobs · Logs · Templates · Machines    │
 └─────────────────────┬───────────────────────────────┘
-                      │ HTTP/REST
+                      │ HTTP REST / JSON
 ┌─────────────────────▼───────────────────────────────┐
-│              REST API (Node.js + Express)             │
-│   /api/v1/deployments · /logs · /templates           │
-└─────────────────────┬───────────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────────┐
-│             AUTOMATION CONTROLLER                     │
-│   Deployment Engine · Step Executor · Log Writer     │
+│         REST API  (Node.js + Express / Render)       │
+│   /api/v1/deployments · /logs · /templates · more   │
 └─────────────────────┬───────────────────────────────┘
                       │
 ┌─────────────────────▼───────────────────────────────┐
-│          POWERSHELL AUTOMATION SCRIPTS               │
-│   install_packages.ps1 · configure_security.ps1      │
-│   system_health_check.ps1 · generate_report.ps1      │
+│         AUTOMATION CONTROLLER                        │
+│   Deployment Engine · Step Executor · Log Writer    │
 └─────────────────────┬───────────────────────────────┘
                       │
 ┌─────────────────────▼───────────────────────────────┐
-│             PostgreSQL DATABASE                       │
-│   deployments · deployment_logs · machines           │
-│   deployment_templates · automation_scripts          │
+│         POWERSHELL SCRIPTS                           │
+│   install_packages · configure_security · health    │
+└─────────────────────┬───────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────┐
+│         PostgreSQL DATABASE  (Neon)                  │
+│   deployments · logs · templates · machines         │
 └─────────────────────────────────────────────────────┘
 ```
-
----
-
-## Features
-
-### Deployment Dashboard
-- Real-time stats: total, successful, failed, active, pending
-- Live deployment progress visualization
-- Machine fleet status pie chart
-- Area chart for deployment history
-- Activity log feed with auto-refresh
-
-### Deployment Job Manager
-- Create deployment jobs by selecting a machine + template
-- Execute, cancel, and monitor jobs
-- Per-step progress tracking with named stages
-- Error reporting with full stack trace capture
-
-### 5-Step Deployment Workflow
-| Step | Name | Description |
-|------|------|-------------|
-| 1 | Initialize Deployment | System health check & env validation |
-| 2 | Apply OS Image Config | Baseline OS configuration |
-| 3 | Install Software | Package installation per template |
-| 4 | Apply Security Policies | Firewall rules, GPO, BitLocker |
-| 5 | Finalize Configuration | Report generation & handoff |
-
-### Deployment Templates
-- Create reusable deployment blueprints
-- Define software packages, security config, and scripts
-- Developer Machine, Data Science Workstation, Standard Office presets
-
-### Audit Logs
-- Full timestamped log trail per deployment
-- Severity levels: `INFO`, `WARN`, `ERROR`, `DEBUG`
-- Live log viewer with search and filter
-- Script output capture per step
-
-### Machine Registry
-- Register and track endpoints by name, IP, department
-- Real-time status: `online`, `offline`, `deploying`, `unknown`
-- Deployment history per machine
-- Last-seen timestamps
-
-### PowerShell Automation
-- `install_packages.ps1` — Package installation with registry
-- `configure_security.ps1` — Firewall rules, UAC, BitLocker, GPO
-- `system_health_check.ps1` — Hardware/OS readiness validation
-- `generate_report.ps1` — Post-deployment audit report
 
 ---
 
@@ -102,10 +53,34 @@ The system follows real-world patterns used in enterprise environments — from 
 | State | Redux Toolkit |
 | Charts | Recharts |
 | Backend | Node.js, Express.js, TypeScript |
-| Database | PostgreSQL 16 |
+| Database | PostgreSQL 16 (Neon cloud) |
 | Automation | PowerShell 7 scripts |
 | DevOps | Docker, Docker Compose, GitHub Actions |
-| Deployment | Vercel (frontend), Render (backend) |
+| Hosting | Vercel (frontend) · Render (backend) · Neon (database) |
+
+---
+
+## Features
+
+- **Deployment Dashboard** — live stat cards, area chart, pie chart, active job progress, log feed
+- **Deployment Job Manager** — create/execute/cancel jobs, 5-step progress tracking, error reporting
+- **Audit Log Viewer** — terminal-style live log viewer with search, level filter, and line numbers
+- **Template Manager** — create reusable blueprints with software lists, scripts, and security config
+- **Machine Registry** — register and track endpoints with status, department, and deployment history
+- **PowerShell Engine** — 3 scripts: package install, security hardening, system health check
+- **Real-time polling** — dashboard auto-refreshes every 3–6 seconds during active deployments
+
+---
+
+## 5-Step Deployment Workflow
+
+| Step | Name | Script |
+|------|------|--------|
+| 1 | Initialize Deployment | `system_health_check.ps1` |
+| 2 | Apply OS Image Config | — |
+| 3 | Install Required Software | `install_packages.ps1` |
+| 4 | Apply Security Policies | `configure_security.ps1` |
+| 5 | Finalize Configuration | `generate_report.ps1` |
 
 ---
 
@@ -113,214 +88,225 @@ The system follows real-world patterns used in enterprise environments — from 
 
 ```
 windeply/
-├── frontend/                     # Next.js frontend
-│   └── src/
-│       ├── app/                  # App router pages
-│       │   ├── page.tsx          # Dashboard
-│       │   ├── jobs/page.tsx     # Deployment jobs
-│       │   ├── logs/page.tsx     # Audit logs
-│       │   ├── templates/        # Templates management
-│       │   └── machines/         # Machine registry
-│       ├── components/
-│       │   ├── ui/               # Shared UI components
-│       │   └── layout/           # Sidebar, header
-│       ├── store/                # Redux store + slices
-│       └── lib/api.ts            # Typed API client
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx              # Dashboard
+│   │   │   ├── jobs/page.tsx         # Deployment jobs
+│   │   │   ├── logs/page.tsx         # Audit log viewer
+│   │   │   ├── templates/page.tsx    # Templates CRUD
+│   │   │   ├── machines/page.tsx     # Machine registry
+│   │   │   ├── layout.tsx            # Root layout + providers
+│   │   │   └── globals.css           # Terminal theme CSS
+│   │   ├── components/
+│   │   │   ├── ui/index.tsx          # Shared UI components
+│   │   │   ├── layout/Sidebar.tsx    # Navigation sidebar
+│   │   │   └── Providers.tsx         # Redux provider
+│   │   ├── store/
+│   │   │   ├── index.ts              # Redux store config
+│   │   │   └── slices/               # dashboardSlice, deploymentsSlice
+│   │   └── lib/api.ts                # Typed API client
+│   ├── package.json
+│   ├── tsconfig.json                 # baseUrl + @/ alias
+│   ├── tailwind.config.js
+│   └── .env.local
 │
-├── backend/                      # Express API
-│   └── src/
-│       ├── controllers/          # Route handlers
-│       ├── routes/               # API route definitions
-│       ├── services/             # Deployment engine
-│       ├── db/                   # PostgreSQL pool + init
-│       └── types/                # Shared TypeScript types
+├── backend/
+│   ├── src/
+│   │   ├── controllers/              # 5 resource controllers
+│   │   ├── routes/index.ts           # All API routes
+│   │   ├── services/deploymentService.ts  # Async automation engine
+│   │   ├── db/index.ts               # Pool + DB init + seed data
+│   │   ├── types/index.ts            # Shared TypeScript types
+│   │   └── index.ts                  # Express app entry point
+│   ├── package.json                  # @types/* in dependencies
+│   ├── tsconfig.json                 # types: [node]
+│   └── .env
 │
-├── scripts/
-│   └── powershell/               # Automation scripts
-│       ├── install_packages.ps1
-│       ├── configure_security.ps1
-│       ├── system_health_check.ps1
-│       └── generate_report.ps1
+├── scripts/powershell/
+│   ├── install_packages.ps1
+│   ├── configure_security.ps1
+│   └── system_health_check.ps1
 │
-├── database/
-│   └── schema.sql                # Database schema
-│
-├── .github/workflows/
-│   └── ci-cd.yml                 # GitHub Actions pipeline
-│
+├── database/schema.sql
 ├── docker-compose.yml
+├── .github/workflows/ci-cd.yml
 └── README.md
 ```
 
 ---
 
-## Getting Started
+## Local Development
 
 ### Prerequisites
-
 - Docker & Docker Compose
-- Node.js 20+ (for local dev without Docker)
-- PostgreSQL 16 (for local dev without Docker)
+- Node.js 20+
 
-### Run with Docker Compose (Recommended)
+### Run with Docker (recommended)
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourorg/windeply.git
+git clone https://github.com/pavan1832/windeply.git
 cd windeply
-
-# Start all services
 docker compose up --build
 
-# Access the app:
 # Frontend: http://localhost:3000
-# Backend API: http://localhost:4000
-# API Health: http://localhost:4000/health
+# Backend:  http://localhost:4000
+# Health:   http://localhost:4000/health
 ```
 
-### Local Development
+### Run manually
 
-#### Backend
-
+**Backend**
 ```bash
 cd backend
-cp .env.example .env
+cp .env.example .env        # edit DB credentials
 npm install
-npm run dev       # Starts on http://localhost:4000
+npm run dev                  # http://localhost:4000
 ```
 
-#### Frontend
-
+**Frontend**
 ```bash
 cd frontend
-cp .env.example .env.local
-# Set NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+# create .env.local with:
+# NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
 npm install
-npm run dev       # Starts on http://localhost:3000
+npm run dev                  # http://localhost:3000
 ```
 
 ---
 
-## REST API Reference
+## Environment Variables
 
-### Dashboard
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/dashboard/stats` | Deployment stats + recent logs |
+### Backend `.env`
+```
+PORT=4000
+DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require   # for Neon/cloud
+DB_HOST=localhost       # for local dev without DATABASE_URL
+DB_PORT=5432
+DB_NAME=windeply
+DB_USER=postgres
+DB_PASSWORD=postgres
+FRONTEND_URL=http://localhost:3000
+NODE_ENV=development
+```
 
-### Deployments
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/deployments` | List all deployments |
-| POST | `/api/v1/deployments` | Create deployment job |
-| GET | `/api/v1/deployments/:id` | Get deployment by ID |
-| POST | `/api/v1/deployments/:id/execute` | Start deployment |
-| POST | `/api/v1/deployments/:id/cancel` | Cancel deployment |
+> **Note:** If `DATABASE_URL` is set, it takes priority over individual `DB_*` variables. Use `DATABASE_URL` for Neon/Render cloud deployment.
 
-### Logs
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/logs` | Get all logs (searchable) |
-| GET | `/api/v1/deployments/:id/logs` | Logs for deployment |
-
-### Templates
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/templates` | List all templates |
-| POST | `/api/v1/templates` | Create template |
-| GET | `/api/v1/templates/:id` | Get template |
-| PUT | `/api/v1/templates/:id` | Update template |
-| DELETE | `/api/v1/templates/:id` | Delete template |
-
-### Machines
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/machines` | List all machines |
-| POST | `/api/v1/machines` | Register machine |
-| PUT | `/api/v1/machines/:id` | Update machine |
-| DELETE | `/api/v1/machines/:id` | Remove machine |
-
-### Scripts
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/scripts` | List automation scripts |
-
----
-
-## Example API Requests
-
-```bash
-# Create a deployment job
-curl -X POST http://localhost:4000/api/v1/deployments \
-  -H "Content-Type: application/json" \
-  -d '{"machine_id":"<uuid>","template_id":"<uuid>","configuration_profile":"developer"}'
-
-# Execute a deployment
-curl -X POST http://localhost:4000/api/v1/deployments/<id>/execute
-
-# Fetch logs with search
-curl "http://localhost:4000/api/v1/logs?search=security&level=info&limit=50"
+### Frontend `.env.local`
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
 ```
 
 ---
 
 ## Cloud Deployment
 
-### Frontend → Vercel
+### Database — Neon
+1. Create project at [neon.tech](https://neon.tech)
+2. Copy the connection string: `postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require`
 
-```bash
-cd frontend
-npx vercel --prod
+### Backend — Render
+1. New Web Service → connect GitHub repo
+2. Root directory: `backend`
+3. Build: `npm install && npm run build`
+4. Start: `npm start`
+5. Environment variables:
+   ```
+   NODE_ENV=production
+   DATABASE_URL=<your Neon connection string>
+   FRONTEND_URL=https://your-app.vercel.app
+   ```
 
-# Set environment variable:
-# NEXT_PUBLIC_API_URL = https://your-render-app.onrender.com/api/v1
+### Frontend — Vercel
+1. Import GitHub repo at [vercel.com](https://vercel.com)
+2. Root directory: `frontend`
+3. Framework: Next.js (auto-detected)
+4. Environment variable:
+   ```
+   NEXT_PUBLIC_API_URL=https://your-api.onrender.com/api/v1
+   ```
+
+---
+
+## REST API Reference
+
+### Base URL
+```
+Production: https://windeply-1.onrender.com/api/v1
+Local:      http://localhost:4000/api/v1
 ```
 
-### Backend → Render
+### Endpoints
 
-1. Create new **Web Service** on render.com
-2. Set **Build Command**: `npm install && npm run build`
-3. Set **Start Command**: `npm start`
-4. Add environment variables from `.env.example`
-5. Add PostgreSQL database via Render's managed DB service
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard/stats` | Stats, recent logs, machine status counts |
+| GET | `/deployments` | List deployments (filter: `?status=running`) |
+| POST | `/deployments` | Create deployment job |
+| GET | `/deployments/:id` | Get deployment by ID |
+| POST | `/deployments/:id/execute` | Start deployment workflow |
+| POST | `/deployments/:id/cancel` | Cancel job |
+| GET | `/logs` | All logs (`?search=&level=error&limit=200`) |
+| GET | `/deployments/:id/logs` | Logs for a specific deployment |
+| GET | `/templates` | List all templates |
+| POST | `/templates` | Create template |
+| PUT | `/templates/:id` | Update template |
+| DELETE | `/templates/:id` | Delete template |
+| GET | `/machines` | List machines with deployment stats |
+| POST | `/machines` | Register machine |
+| PUT | `/machines/:id` | Update machine |
+| DELETE | `/machines/:id` | Remove machine |
+| GET | `/scripts` | List automation scripts |
 
 ---
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow at `.github/workflows/ci-cd.yml` runs:
+`.github/workflows/ci-cd.yml` runs on every push to `main`:
 
-1. **Lint & TypeCheck** — Both frontend and backend
-2. **Build Backend** — Compile TypeScript, upload artifact
-3. **Build Frontend** — Next.js production build
-4. **Docker Build & Push** — Images to GitHub Container Registry
-5. **Deploy Backend** — Trigger Render deploy hook
-6. **Deploy Frontend** — Push to Vercel production
+```
+push to main
+    │
+    ├── lint (frontend + backend)
+    ├── build-backend  → uploads dist/
+    ├── build-frontend → uploads .next/
+    ├── docker         → push to GHCR
+    ├── deploy-backend → Render deploy hook
+    └── deploy-frontend → Vercel production
+```
 
-Required secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `RENDER_DEPLOY_HOOK_BACKEND`
+Required GitHub secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `RENDER_DEPLOY_HOOK_BACKEND`
+
+---
+
+## Bugs Fixed During Development
+
+| # | Issue | Fix |
+|---|-------|-----|
+| 1 | Malformed `{frontend,...}` folder in zip | Removed phantom folder from brace expansion bug |
+| 2 | `Module not found: ../../lib/api` | Changed all imports to `@/` alias, added `baseUrl` to tsconfig |
+| 3 | Backend: password auth failed | Added missing `.env` and `.env.local` files |
+| 4 | Render: `Cannot find declaration file for express` | Moved `@types/*` and `typescript` from `devDependencies` to `dependencies` |
+| 5 | Render: `Cannot find name 'process'` | Added `"types": ["node"]` to `backend/tsconfig.json` |
+| 6 | `DATABASE_URL` not supported for Neon | Updated `db/index.ts` to detect `DATABASE_URL` and use SSL connection string |
 
 ---
 
 ## PowerShell Scripts
 
-Scripts are located in `scripts/powershell/`. They are designed to run on target Windows machines and simulate the full deployment lifecycle.
-
 ```powershell
-# Health check before deployment
+# System health check (12 checks)
 .\system_health_check.ps1
 
-# Install software packages
+# Install packages
 .\install_packages.ps1 -PackageList "git,vscode,nodejs" -Profile developer
 
-# Apply security policies
+# Apply security hardening (CIS Level 1)
 .\configure_security.ps1 -Level hardened -EnableBitLocker
+
+# Dry run (no changes applied)
+.\configure_security.ps1 -Level hardened -WhatIf
 ```
-
----
-
-## Screenshots
-
-> Dashboard, Jobs, Logs, Templates, and Machines pages with terminal-style dark UI.
 
 ---
 
