@@ -1,0 +1,117 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --terminal-bg: #0a0e1a;
+  --terminal-surface: #0f1629;
+  --terminal-border: #1e2d4a;
+  --terminal-accent: #00d4ff;
+  --terminal-green: #00ff88;
+  --terminal-yellow: #ffcc00;
+  --terminal-red: #ff4444;
+  --terminal-muted: #4a6080;
+  --terminal-text: #c8d8f0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--terminal-bg);
+  color: var(--terminal-text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--terminal-bg); }
+::-webkit-scrollbar-thumb { background: var(--terminal-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--terminal-muted); }
+
+/* Terminal card */
+.terminal-card {
+  background: var(--terminal-surface);
+  border: 1px solid var(--terminal-border);
+  border-radius: 4px;
+}
+
+/* Status badge */
+.status-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Glow effects */
+.glow-accent { box-shadow: 0 0 20px rgba(0, 212, 255, 0.15); }
+.glow-green { box-shadow: 0 0 20px rgba(0, 255, 136, 0.15); }
+.glow-red { box-shadow: 0 0 20px rgba(255, 68, 68, 0.15); }
+
+/* Log output terminal */
+.log-terminal {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  background: #060a14;
+  border: 1px solid var(--terminal-border);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 3px;
+  background: var(--terminal-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--terminal-accent), var(--terminal-green));
+  transition: width 0.5s ease;
+}
+
+/* Animated border for running state */
+@keyframes border-pulse {
+  0%, 100% { border-color: var(--terminal-border); }
+  50% { border-color: var(--terminal-accent); }
+}
+
+.running-border {
+  animation: border-pulse 2s ease-in-out infinite;
+}
+
+/* Grid scanline effect */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor::after {
+  content: '█';
+  animation: cursor-blink 1s step-end infinite;
+  color: var(--terminal-accent);
+  font-size: 0.8em;
+}
